@@ -4,6 +4,11 @@ from tkinter import ttk
 import datetime
 from datetime import timedelta
 
+## Things to do
+## Update README
+## Make GIF
+## Update Website
+
 class ToDoList:
 
     def __init__(self, master):
@@ -23,6 +28,23 @@ class ToDoList:
 
         #First page// this will eventually be our OverView page
         self.page1 = tk.Frame(self.notebook, bg='white')
+        self.canvas = Canvas(self.page1, height = 200)
+        self.frame = Frame(self.canvas)
+
+        # a scrollbar in page1
+        self.scrollbar = Scrollbar(self.page1, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.canvas.pack(side="left", fill="both", expand=True)
+
+        self.canvas.create_window((4,4), window=self.frame, anchor="nw", tags="frame")
+        self.frame.bind("<Configure>", lambda x: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.master.bind("<MouseWheel>", lambda x: self.canvas.yview_scroll(int(-1*(x.delta/40)), "units"))
+
+        self.master.bind("<Down>", lambda x: self.canvas.yview_scroll(3, 'units'))
+        self.master.bind("<Up>", lambda x: self.canvas.yview_scroll(-3, 'units'))
+
+
+
         self.tasknum = 0
         self.add_task_button = Button(self.page1, text="+ Add Task", command = lambda: self.create())
 
@@ -30,12 +52,9 @@ class ToDoList:
         #LAYOUT OF PAGE 1
         self.add_task_button.place(relx=0.5, rely=.95, anchor=CENTER)
 
-
-
         # Second page // this will eventually be our Next 7 Days page
         self.page2 = tk.Frame(self.notebook)
 
-        # LAYOUT OF PAGE 2
 
         self.notebook.add(self.page1, text='OverView')
         self.notebook.add(self.page2, text='Next 7 Days')
@@ -89,7 +108,7 @@ class ToDoList:
         self.label_text = StringVar()
         self.label_text.set(self.tasklisttext)
 
-        self.listlabel = Label(self.page1, textvariable=self.label_text)
+        self.listlabel = Label(self.frame, textvariable=self.label_text)
         self.listlabel.bind("<Button-1>", self.test)
 
 
@@ -126,8 +145,6 @@ class ToDoList:
 
                 recentTLabel.grid(row = num, column = 1, columnspan = 3, pady=10, padx = 80)
                 num += 1
-
-
 
 
         self.window.destroy()
